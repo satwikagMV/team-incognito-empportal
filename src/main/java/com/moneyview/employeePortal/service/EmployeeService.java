@@ -3,19 +3,32 @@ package com.moneyview.employeePortal.service;
 import com.moneyview.employeePortal.dto.EmployeeDto;
 import com.moneyview.employeePortal.dto.EmployeeRequest;
 import com.moneyview.employeePortal.entity.Employee;
+import com.moneyview.employeePortal.entity.Tag;
+import com.moneyview.employeePortal.entity.Type;
 import com.moneyview.employeePortal.repository.EmployeeRepository;
+import com.moneyview.employeePortal.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-
+    private final TagRepository tagRepository;
     private final CloudinaryService cloudinaryService;
+
+    public Boolean verify(String username, String password) throws Throwable {
+
+       Employee e =employeeRepository.findOneByUsername(username);
+       if (e==null) throw new NullPointerException();
+
+       return Objects.equals(e.getPassword(), password);
+    }
 
     public void createEmployee(EmployeeRequest req) throws Throwable{
 //        check if employee Exist or Not
@@ -46,9 +59,10 @@ public class EmployeeService {
         }
         employeeRepository.save(emp);
     }
-//
-    public void addOrUpdateDisplayImage(EmployeeRequest req){
+
+    public String addOrUpdateDisplayImage(EmployeeRequest req){
         Employee currEmployee= employeeRepository.findOneByUsername(req.getUsername());
+
         if (req.getDisplayImg()!=null) {
             if (currEmployee.getDisplayImgUrl()!=null)
                 cloudinaryService.deleteFile(
@@ -59,6 +73,7 @@ public class EmployeeService {
 
         }
         employeeRepository.save(currEmployee);
+        return currEmployee.getDisplayImgUrl();
     }
 
     public void updateEmployeeDetails(EmployeeRequest req){
@@ -88,7 +103,7 @@ public class EmployeeService {
         // finding Employee
         return mapToDto(employeeRepository.findOneByUsername(username));
     }
-    public List<EmployeeDto> getReporetee(String username){
+    public List<EmployeeDto> getReportee(String username){
         return employeeRepository.findOneByUsername(username)
                 .getReportee()
                 .stream()
@@ -96,6 +111,13 @@ public class EmployeeService {
                 .toList();
     }
 
+
+    public void assignTag(String username, String tagName, Type type){
+        Tag reqTag= tagRepository.findByNameAndType(tagName,type);
+        Employee currEmp=employeeRepository.findOneByUsername(username);
+        currEmp.getAssignedTags().add(reqTag);
+        employeeRepository.save(currEmp);
+    }
     public EmployeeDto getManagerDetails(String username){
         return mapToDto(
                 employeeRepository
@@ -122,7 +144,12 @@ public class EmployeeService {
                 .name(e.getName())
                 .designation(e.getDesignation())
                 .level(e.getLevel())
+                .phoneNo(e.getPhoneNo())
+                .slackId(e.getSlackId())
+                .badgeImgUrl(e.getBadgeImgUrl())
                 .displayImgUrl(e.getDisplayImgUrl())
+                .assignedTags(e.getAssignedTags())
+                .reportee(e.getReportee())
         .build();
     }
 

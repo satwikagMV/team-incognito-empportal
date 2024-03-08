@@ -1,5 +1,6 @@
 package com.moneyview.employeePortal.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
 
@@ -41,11 +42,14 @@ public class Employee {
 
     private String badgeImgUrl=null;
 
-    @ManyToOne (cascade = CascadeType.REMOVE)
+
+    @JsonIgnore
+    @ManyToOne (cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private Employee manager=null;
 
     @OneToMany (cascade = CascadeType.ALL,mappedBy = "manager")
     private Set<Employee> reportee;
+
 
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name = "employee_tag",

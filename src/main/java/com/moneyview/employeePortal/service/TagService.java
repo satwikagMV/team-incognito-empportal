@@ -19,7 +19,7 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
-    public void createorGetTag(String tagName , Type tagType) throws Throwable {
+    public void createOrGetTag(String tagName , Type tagType) throws Throwable {
         Tag tg=tagRepository.findByNameAndType(tagName,tagType);
         if (tg!=null){
         }
@@ -30,7 +30,8 @@ public class TagService {
 
         tagRepository.save(tag);
     }
-    
+
+
 
     public List<EmployeeDto> getAssociatedEmployees(String tagName,Type tagType){
         return tagRepository.findByNameAndType(tagName,tagType)
@@ -48,6 +49,7 @@ public class TagService {
         return TagDto.builder()
                 .name(t.getName())
                 .type(t.getType())
+                .memberCount((long) t.getAssociatedEmployees().size())
                 .build();
     }
 
