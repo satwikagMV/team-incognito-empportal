@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeRequest {
     private String username=null;
     private String email=null;
+    private String password=null;
     private String name=null;
     private String designation=null;
     private Integer level=null;

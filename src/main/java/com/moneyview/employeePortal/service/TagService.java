@@ -30,6 +30,7 @@ public class TagService {
 
         tagRepository.save(tag);
     }
+    
 
     public List<EmployeeDto> getAssociatedEmployees(String tagName,Type tagType){
         return tagRepository.findByNameAndType(tagName,tagType)
@@ -39,13 +40,11 @@ public class TagService {
                 .toList();
     }
 
-    public List<Tag> getCommunities(){
-        return tagRepository.findByType(Type.COMMUNITY);
+    public List<TagDto> getCommunities(){
+        return tagRepository.findByType(Type.COMMUNITY).stream().map(TagService::mapToDto).toList();
     }
 
-
-
-    private TagDto mapToDto(Tag t){
+    private static TagDto mapToDto(Tag t){
         return TagDto.builder()
                 .name(t.getName())
                 .type(t.getType())
@@ -60,7 +59,11 @@ public class TagService {
                 .name(e.getName())
                 .designation(e.getDesignation())
                 .level(e.getLevel())
+                .badgeImgUrl(e.getBadgeImgUrl())
                 .displayImgUrl(e.getDisplayImgUrl())
+                .assignedTags(e.getAssignedTags())
+                .manager(e.getManager())
+                .reportee(e.getReportee())
                 .build();
     }
 }

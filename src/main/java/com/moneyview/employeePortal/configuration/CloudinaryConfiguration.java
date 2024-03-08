@@ -2,22 +2,21 @@ package com.moneyview.employeePortal.configuration;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
+@RequiredArgsConstructor
 public class CloudinaryConfiguration {
 
-    @Value("${cloudinary.cloud_name}")
-    private String cloudName;
+    private final String cloudName="dfk6ftcdb";
 
-    @Value("${cloudinary.api_key}")
-    private String apiKey;
+    private final String apiKey="263755754574323";
 
-    @Value("${cloudinary.api_secret}")
-    private String apiSecret;
+    private final String apiSecret="EdhRHBW_0orWJdjNNlOJzVZSVkg";
 
     @Bean
     public Cloudinary cloudinary() {

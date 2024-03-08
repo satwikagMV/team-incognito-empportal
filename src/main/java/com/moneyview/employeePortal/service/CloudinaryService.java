@@ -3,15 +3,20 @@ package com.moneyview.employeePortal.service;
 
 import com.cloudinary.Cloudinary;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class CloudinaryService {
     @Resource
-    private Cloudinary cloudinary;
+    @Autowired
+    private  Cloudinary cloudinary;
 
     public String uploadFile(MultipartFile file, String folderName) {
         try{
