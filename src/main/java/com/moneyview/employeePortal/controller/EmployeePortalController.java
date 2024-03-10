@@ -62,7 +62,7 @@ public class EmployeePortalController {
     }
     @GetMapping("/user/{username}")
     public ResponseEntity<?> employeeDetails(@PathVariable String username){
-        return new ResponseEntity<EmployeeDto>(employeeService.getEmployeeDetails(username), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeeDetails(username), HttpStatus.OK);
     }
 
     @PostMapping("/assign")

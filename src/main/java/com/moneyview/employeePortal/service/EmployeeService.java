@@ -99,9 +99,9 @@ public class EmployeeService {
 
         employeeRepository.save(reqEmp);
     }
-    public EmployeeDto getEmployeeDetails(String username) {
+    public Employee getEmployeeDetails(String username) {
         // finding Employee
-        return mapToDto(employeeRepository.findOneByUsername(username));
+        return employeeRepository.findOneByUsername(username);
     }
     public List<Employee> getReportee(String username){
         return employeeRepository.findOneByUsername(username)
