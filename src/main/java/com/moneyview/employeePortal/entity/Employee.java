@@ -16,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Employee {
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,6 +48,7 @@ public class Employee {
     @ManyToOne (cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private Employee manager=null;
 
+    @JsonIgnore
     @OneToMany (cascade = CascadeType.ALL,mappedBy = "manager")
     private Set<Employee> reportee;
 

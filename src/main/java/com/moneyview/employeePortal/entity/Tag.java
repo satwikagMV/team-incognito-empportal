@@ -1,5 +1,6 @@
 package com.moneyview.employeePortal.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class Tag {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @JsonIgnore
     @ManyToMany (cascade = CascadeType.ALL,mappedBy = "assignedTags")
     private Set<Employee> associatedEmployees=new HashSet<>();
 }

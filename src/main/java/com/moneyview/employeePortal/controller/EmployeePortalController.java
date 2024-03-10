@@ -1,57 +1,75 @@
 package com.moneyview.employeePortal.controller;
 
-import com.moneyview.employeePortal.dto.AuthRequest;
-import com.moneyview.employeePortal.dto.EmployeeDto;
-import com.moneyview.employeePortal.dto.EmployeeRequest;
+import com.moneyview.employeePortal.dto.*;
 import com.moneyview.employeePortal.service.EmployeeService;
 import com.moneyview.employeePortal.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+import java.util.HashMap;
+import java.util.List;
+
+@CrossOrigin(origins = "*", allowedHeaders = "*",originPatterns = "*")
 @RestController
 @RequestMapping("/api")
 public class EmployeePortalController {
 
-    EmployeeService employeeService;
-    TagService tagService;
+    private final EmployeeService employeeService;
+    private final TagService tagService;
 
     EmployeePortalController(EmployeeService e,TagService t){
         this.employeeService=e;
         this.tagService=t;
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?>  signupEmployee(@RequestBody EmployeeRequest empData){
-        try {
-            employeeService.createEmployee(empData);
-        }
-        catch (Throwable e){
-            new ResponseEntity<>("Already Exists",HttpStatus.CONFLICT);
-        }
 
-        return new ResponseEntity<>("Employee Created",HttpStatus.OK);
+
+    @GetMapping("/reportee/{username}")
+    public ResponseEntity<?> getReportee(@PathVariable String username){
+        return new ResponseEntity<>(employeeService.getReportee(username),HttpStatus.OK);
+
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> loginEmployee (@RequestBody AuthRequest authReq){
-        try {
-            Boolean success =employeeService.verify(authReq.getUsername(),authReq.getPassword());
-            if (!success) return new ResponseEntity<>(false,HttpStatus.UNAUTHORIZED);
+    @GetMapping("/manager/{username}")
+    public ResponseEntity<?> getManager(@PathVariable String username){
+        EmployeeDto manager=employeeService.getManagerDetails(username);
+        if (manager==null){
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        catch (Throwable e){
-            return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
-        }
-        return  new ResponseEntity<>(true,HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getManagerDetails(username),HttpStatus.OK);
+
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchEntities(@RequestParam(value = "q",required = false) String pattern,
+                                            @RequestParam(value = "e",required = false) String empPattern,
+                                            @RequestParam(value = "t",required = false) String tagPattern){
+        if (pattern!=null){
+            List<SearchEmpDto> empList = employeeService.getAllEmployeesMatching(pattern);
+            List<TagDto> tagList=tagService.getTagsMatching(pattern);
+            return new ResponseEntity<>(new List[]{empList, tagList},HttpStatus.OK);
+        }
+        else if (empPattern!=null){
+            List<SearchEmpDto> empList = employeeService.getAllEmployeesMatching(empPattern);
+            return new ResponseEntity<>(empList,HttpStatus.OK);
+        }
+        else if (tagPattern!=null) {
+            List<TagDto> tagList=tagService.getTagsMatching(tagPattern);
+            return new ResponseEntity<>(tagList,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     @GetMapping("/user/{username}")
     public ResponseEntity<?> employeeDetails(@PathVariable String username){
         return new ResponseEntity<EmployeeDto>(employeeService.getEmployeeDetails(username), HttpStatus.OK);
     }
 
+    @PostMapping("/assign")
+    public  ResponseEntity<?> assignEmployeeTag(@RequestBody EmployeeTagDto empTag){
+        employeeService.assignTag(empTag.getUsername(), empTag.getTagName(),empTag.getType());
+        return new ResponseEntity<>("Added Successfully",HttpStatus.CREATED);
+    }
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDisplayImage(EmployeeRequest req){
         String displayImgUrl= employeeService.addOrUpdateDisplayImage(req);

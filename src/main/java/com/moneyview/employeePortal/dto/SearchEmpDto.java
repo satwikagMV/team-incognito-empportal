@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeResponse {
-    List<EmployeeDto> employees=new ArrayList<>();
+@AllArgsConstructor
+public class SearchEmpDto {
+    private String name;
+    private String displayImgUrl;
 }

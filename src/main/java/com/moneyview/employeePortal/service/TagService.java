@@ -1,14 +1,11 @@
 package com.moneyview.employeePortal.service;
 
 import com.moneyview.employeePortal.dto.EmployeeDto;
-import com.moneyview.employeePortal.dto.EmployeeResponse;
 import com.moneyview.employeePortal.dto.TagDto;
-import com.moneyview.employeePortal.dto.TagResponse;
 import com.moneyview.employeePortal.entity.Employee;
 import com.moneyview.employeePortal.entity.Tag;
 import com.moneyview.employeePortal.entity.Type;
 import com.moneyview.employeePortal.repository.TagRepository;
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +16,10 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
-    public void createOrGetTag(String tagName , Type tagType) throws Throwable {
+    public Tag createOrGetTag(String tagName , Type tagType) throws Throwable {
         Tag tg=tagRepository.findByNameAndType(tagName,tagType);
         if (tg!=null){
+            return tg;
         }
         Tag tag=Tag.builder()
                 .name(tagName)
@@ -29,8 +27,17 @@ public class TagService {
                 .build();
 
         tagRepository.save(tag);
+
+        return tag;
     }
 
+    public List<TagDto> getTagsMatching(String prefix){
+        return tagRepository
+                .findByNameStartsWith(prefix)
+                .stream()
+                .map(TagService::mapToDto)
+                .toList();
+    }
 
 
     public List<EmployeeDto> getAssociatedEmployees(String tagName,Type tagType){

@@ -2,13 +2,13 @@ package com.moneyview.employeePortal.service;
 
 import com.moneyview.employeePortal.dto.EmployeeDto;
 import com.moneyview.employeePortal.dto.EmployeeRequest;
+import com.moneyview.employeePortal.dto.SearchEmpDto;
 import com.moneyview.employeePortal.entity.Employee;
 import com.moneyview.employeePortal.entity.Tag;
 import com.moneyview.employeePortal.entity.Type;
 import com.moneyview.employeePortal.repository.EmployeeRepository;
 import com.moneyview.employeePortal.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +22,12 @@ public class EmployeeService {
     private final TagRepository tagRepository;
     private final CloudinaryService cloudinaryService;
 
-    public Boolean verify(String username, String password) throws Throwable {
-
-       Employee e =employeeRepository.findOneByUsername(username);
-       if (e==null) throw new NullPointerException();
-
-       return Objects.equals(e.getPassword(), password);
+    public Boolean verifyCredentials(String username, String password) throws Throwable {
+//        System.out.println("Reached Verify");
+        Employee emp =employeeRepository.findOneByUsername(username);
+        System.out.println(emp);
+        if (emp==null) throw new NullPointerException();
+        return Objects.equals(emp.getPassword(), password);
     }
 
     public void createEmployee(EmployeeRequest req) throws Throwable{
@@ -103,31 +103,33 @@ public class EmployeeService {
         // finding Employee
         return mapToDto(employeeRepository.findOneByUsername(username));
     }
-    public List<EmployeeDto> getReportee(String username){
+    public List<Employee> getReportee(String username){
         return employeeRepository.findOneByUsername(username)
                 .getReportee()
                 .stream()
-                .map(EmployeeService::mapToDto)
                 .toList();
     }
 
 
     public void assignTag(String username, String tagName, Type type){
         Tag reqTag= tagRepository.findByNameAndType(tagName,type);
+        if (reqTag==null) reqTag=Tag.builder().name(tagName).type(type).build();
+        tagRepository.save(reqTag);
         Employee currEmp=employeeRepository.findOneByUsername(username);
         currEmp.getAssignedTags().add(reqTag);
         employeeRepository.save(currEmp);
     }
     public EmployeeDto getManagerDetails(String username){
-        return mapToDto(
-                employeeRepository
-                        .findOneByUsername(username)
-                        .getManager());
+        Employee manager= employeeRepository
+                .findOneByUsername(username)
+                .getManager();
+        if (manager!=null) return mapToDto(manager);
+        return null;
     }
-    public List<EmployeeDto> getAllEmployeesMatching(String pattern){
+    public List<SearchEmpDto> getAllEmployeesMatching(String pattern){
         return employeeRepository.findByNameLike("%"+pattern+"%")
                 .stream()
-                .map(EmployeeService::mapToDto)
+                .map(m->new SearchEmpDto(m.getName(),m.getDisplayImgUrl()))
                 .toList();
     }
 
