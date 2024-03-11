@@ -72,7 +72,7 @@ public class EmployeePortalController {
     }
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDisplayImage(EmployeeRequest req){
-        String displayImgUrl= employeeService.addOrUpdateDisplayImageCloudinary(req);
+        String displayImgUrl= employeeService.addOrUpdateDisplayImageFirebase(req);
         if (displayImgUrl!=null){
             return new ResponseEntity<>(displayImgUrl,HttpStatus.OK);
         }

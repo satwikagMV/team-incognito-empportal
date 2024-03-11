@@ -11,6 +11,7 @@ import com.moneyview.employeePortal.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,6 +22,7 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final TagRepository tagRepository;
     private final CloudinaryService cloudinaryService;
+    private final FirebaseService firebaseService;
 
     public Boolean verifyCredentials(String username, String password) throws Throwable {
 //        System.out.println("Reached Verify");
@@ -78,8 +80,14 @@ public class EmployeeService {
 
     public String addOrUpdateDisplayImageFirebase(EmployeeRequest req){
         Employee currEmployee= employeeRepository.findOneByUsername(req.getUsername());
-        if (req.getDisplayImg()!=null){
-
+        try {
+            if (currEmployee.getDisplayImgUrl()!=null){
+                firebaseService.deleteFile(currEmployee.getDisplayImgUrl());
+            }
+            String displayImgUrl = firebaseService.uploadFile(req.getDisplayImg());
+            currEmployee.setDisplayImgUrl(displayImgUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         employeeRepository.save(currEmployee);
         return currEmployee.getDisplayImgUrl();
