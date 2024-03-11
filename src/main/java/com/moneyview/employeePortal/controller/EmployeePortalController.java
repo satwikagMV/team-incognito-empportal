@@ -72,7 +72,7 @@ public class EmployeePortalController {
     }
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDisplayImage(EmployeeRequest req){
-        String displayImgUrl= employeeService.addOrUpdateDisplayImage(req);
+        String displayImgUrl= employeeService.addOrUpdateDisplayImageCloudinary(req);
         if (displayImgUrl!=null){
             return new ResponseEntity<>(displayImgUrl,HttpStatus.OK);
         }
@@ -80,5 +80,15 @@ public class EmployeePortalController {
         return new ResponseEntity<>("Error",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @GetMapping("/individual-tag")
+    public ResponseEntity<?> getAllIndividualTag(){
+        return new ResponseEntity<>(tagService.getIndividualTags(),HttpStatus.OK);
+    }
+
+    @PostMapping("/create-tag")
+    public ResponseEntity<?> createNewATag(@RequestBody TagDto newTag){
+        tagService.createOrGetTag(newTag.getName(),newTag.getType());
+        return new ResponseEntity<>("Tag Created Successfully",HttpStatus.CREATED);
+    }
 
 }

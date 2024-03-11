@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchEmpDto {
+    private String username;
     private String name;
     private String displayImgUrl;
 }

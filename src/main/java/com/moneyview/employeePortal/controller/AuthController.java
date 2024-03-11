@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*",originPatterns = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @AllArgsConstructor
 public class AuthController {
 
@@ -28,7 +28,7 @@ public class AuthController {
             new ResponseEntity<>("Already Exists", HttpStatus.CONFLICT);
         }
 
-        return new ResponseEntity<>("Employee Created",HttpStatus.OK);
+        return new ResponseEntity<>("Employee Created",HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

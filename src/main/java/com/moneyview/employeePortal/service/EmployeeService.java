@@ -60,7 +60,7 @@ public class EmployeeService {
         employeeRepository.save(emp);
     }
 
-    public String addOrUpdateDisplayImage(EmployeeRequest req){
+    public String addOrUpdateDisplayImageCloudinary(EmployeeRequest req){
         Employee currEmployee= employeeRepository.findOneByUsername(req.getUsername());
 
         if (req.getDisplayImg()!=null) {
@@ -70,6 +70,15 @@ public class EmployeeService {
                 );
             String displayImgUrl = cloudinaryService.uploadFile(req.getDisplayImg(),req.getUsername());
             currEmployee.setDisplayImgUrl(displayImgUrl);
+
+        }
+        employeeRepository.save(currEmployee);
+        return currEmployee.getDisplayImgUrl();
+    }
+
+    public String addOrUpdateDisplayImageFirebase(EmployeeRequest req){
+        Employee currEmployee= employeeRepository.findOneByUsername(req.getUsername());
+        if (req.getDisplayImg()!=null){
 
         }
         employeeRepository.save(currEmployee);
@@ -129,7 +138,7 @@ public class EmployeeService {
     public List<SearchEmpDto> getAllEmployeesMatching(String pattern){
         return employeeRepository.findByNameLike("%"+pattern+"%")
                 .stream()
-                .map(m->new SearchEmpDto(m.getName(),m.getDisplayImgUrl()))
+                .map(m->new SearchEmpDto(m.getUsername(),m.getName(),m.getDisplayImgUrl()))
                 .toList();
     }
 

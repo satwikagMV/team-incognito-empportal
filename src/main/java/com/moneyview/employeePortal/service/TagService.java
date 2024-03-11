@@ -16,7 +16,7 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
-    public Tag createOrGetTag(String tagName , Type tagType) throws Throwable {
+    public Tag createOrGetTag(String tagName , Type tagType) {
         Tag tg=tagRepository.findByNameAndType(tagName,tagType);
         if (tg!=null){
             return tg;
@@ -46,6 +46,10 @@ public class TagService {
                 .stream()
                 .map(TagService::mapToDto)
                 .toList();
+    }
+
+    public List<String> getIndividualTags(){
+        return tagRepository.findByType(Type.INDIVIDUAL).stream().map(Tag::getName).toList();
     }
 
     public List<TagDto> getCommunities(){
