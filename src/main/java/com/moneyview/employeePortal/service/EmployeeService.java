@@ -1,14 +1,18 @@
 package com.moneyview.employeePortal.service;
 
+import com.moneyview.employeePortal.dto.DocumentRequest;
 import com.moneyview.employeePortal.dto.EmployeeDto;
 import com.moneyview.employeePortal.dto.EmployeeRequest;
 import com.moneyview.employeePortal.dto.SearchEmpDto;
+import com.moneyview.employeePortal.entity.Document;
 import com.moneyview.employeePortal.entity.Employee;
 import com.moneyview.employeePortal.entity.Tag;
 import com.moneyview.employeePortal.entity.Type;
+import com.moneyview.employeePortal.repository.DocumentRepository;
 import com.moneyview.employeePortal.repository.EmployeeRepository;
 import com.moneyview.employeePortal.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,14 +27,7 @@ public class EmployeeService {
     private final TagRepository tagRepository;
     private final CloudinaryService cloudinaryService;
     private final FirebaseService firebaseService;
-
-    public Boolean verifyCredentials(String username, String password) throws Throwable {
-//        System.out.println("Reached Verify");
-        Employee emp =employeeRepository.findOneByUsername(username);
-        System.out.println(emp);
-        if (emp==null) throw new NullPointerException();
-        return Objects.equals(emp.getPassword(), password);
-    }
+    private final DocumentRepository documentRepository;
 
     public void createEmployee(EmployeeRequest req) throws Throwable{
 //        check if employee Exist or Not
@@ -42,7 +39,7 @@ public class EmployeeService {
                 .username(req.getUsername())
                 .email(req.getEmail())
                 .password(req.getPassword())
-                .name(req.getName().toLowerCase())
+                .name(StringUtils.capitalize(req.getName()))
                 .designation(req.getDesignation())
                 .level(req.getLevel())
                 .phoneNo(req.getPhoneNo())
@@ -56,10 +53,34 @@ public class EmployeeService {
             emp.setManager(manager);
         }
         if (req.getBadgeImg()!=null){
-            String badgeImgUrl = cloudinaryService.uploadFile(req.getBadgeImg(),req.getUsername());
+            String badgeImgUrl = firebaseService.uploadFile(req.getBadgeImg());
             emp.setBadgeImgUrl(badgeImgUrl);
         }
         employeeRepository.save(emp);
+    }
+
+    public void updateEmployeeDetails(EmployeeRequest req) throws IOException {
+        Employee reqEmp=employeeRepository.findOneByUsername(req.getUsername());
+        if (req.getEmail()!=null) reqEmp.setEmail(req.getEmail());
+        if (req.getName()!=null) reqEmp.setName(req.getName());
+        if (req.getPhoneNo()!=null) reqEmp.setPhoneNo(req.getPhoneNo());
+        if (req.getSlackId()!=null) reqEmp.setSlackId(req.getSlackId());
+        if (req.getLevel()!=null) reqEmp.setLevel(req.getLevel());
+        if (req.getDesignation()!=null) reqEmp.setDesignation(req.getDesignation());
+        if (req.getManagerUsername()!=null) {
+            Employee manager = employeeRepository.findOneByUsername(
+                    req.getManagerUsername()
+            );
+            reqEmp.setManager(manager);
+        }
+
+        if (req.getBadgeImg()!=null){
+            cloudinaryService.deleteFile(reqEmp.getBadgeImgUrl());
+            String badgeImgUrl = firebaseService.uploadFile(req.getBadgeImg());
+            reqEmp.setBadgeImgUrl(badgeImgUrl);
+        }
+
+        employeeRepository.save(reqEmp);
     }
 
     public String addOrUpdateDisplayImageCloudinary(EmployeeRequest req){
@@ -93,29 +114,19 @@ public class EmployeeService {
         return currEmployee.getDisplayImgUrl();
     }
 
-    public void updateEmployeeDetails(EmployeeRequest req){
-        Employee reqEmp=employeeRepository.findOneByUsername(req.getUsername());
-        if (req.getEmail()!=null) reqEmp.setEmail(req.getEmail());
-        if (req.getName()!=null) reqEmp.setName(req.getName());
-        if (req.getPhoneNo()!=null) reqEmp.setPhoneNo(req.getPhoneNo());
-        if (req.getSlackId()!=null) reqEmp.setSlackId(req.getSlackId());
-        if (req.getLevel()!=null) reqEmp.setLevel(req.getLevel());
-        if (req.getDesignation()!=null) reqEmp.setDesignation(req.getDesignation());
-        if (req.getManagerUsername()!=null) {
-            Employee manager = employeeRepository.findOneByUsername(
-                    req.getManagerUsername()
-            );
-            reqEmp.setManager(manager);
-        }
+    public String uploadDocument(DocumentRequest req) throws IOException {
+        Employee currEmployee=employeeRepository.findOneByUsername(req.getUsername());
+        String docUrl;
 
-        if (req.getBadgeImg()!=null){
-            cloudinaryService.deleteFile(reqEmp.getBadgeImgUrl());
-            String badgeImgUrl = cloudinaryService.uploadFile(req.getBadgeImg(),req.getUsername());
-            reqEmp.setBadgeImgUrl(badgeImgUrl);
-        }
+        docUrl=firebaseService.uploadFile(req.getDocument());
 
-        employeeRepository.save(reqEmp);
+        Document doc=Document.builder().name(req.getFileName()).url(docUrl).build();
+        documentRepository.save(doc);
+        currEmployee.getDocuments().add(doc);
+        employeeRepository.save(currEmployee);
+        return docUrl;
     }
+
     public Employee getEmployeeDetails(String username) {
         // finding Employee
         return employeeRepository.findOneByUsername(username);
@@ -136,12 +147,10 @@ public class EmployeeService {
         currEmp.getAssignedTags().add(reqTag);
         employeeRepository.save(currEmp);
     }
+
     public EmployeeDto getManagerDetails(String username){
-        Employee manager= employeeRepository
-                .findOneByUsername(username)
-                .getManager();
-        if (manager!=null) return mapToDto(manager);
-        return null;
+        Employee manager = employeeRepository.findOneByUsername(username).getManager();
+        return manager != null ? mapToDto(manager) : null;
     }
     public List<SearchEmpDto> getAllEmployeesMatching(String pattern){
         return employeeRepository.findByNameLike("%"+pattern+"%")
@@ -171,6 +180,4 @@ public class EmployeeService {
                 .reportee(e.getReportee())
         .build();
     }
-
-
 }

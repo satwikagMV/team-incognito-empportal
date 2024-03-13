@@ -32,7 +32,7 @@ public class EmployeeController {
         if (manager == null) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(employeeService.getManagerDetails(username), HttpStatus.OK);
+        return new ResponseEntity<>(manager, HttpStatus.OK);
     }
 
     @GetMapping("/{username}")

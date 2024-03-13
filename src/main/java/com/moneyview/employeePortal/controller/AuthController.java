@@ -3,6 +3,7 @@ package com.moneyview.employeePortal.controller;
 
 import com.moneyview.employeePortal.dto.AuthRequest;
 import com.moneyview.employeePortal.dto.EmployeeRequest;
+import com.moneyview.employeePortal.service.AuthenticationService;
 import com.moneyview.employeePortal.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final EmployeeService employeeService;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signupEmployee(@RequestBody EmployeeRequest empData){
@@ -35,7 +37,7 @@ public class AuthController {
     public ResponseEntity<?> loginEmployee (@RequestBody AuthRequest authReq){
         try {
             System.out.println(authReq.getUsername()+" "+authReq.getPassword());
-            Boolean success =employeeService.verifyCredentials(authReq.getUsername(),authReq.getPassword());
+            Boolean success =authenticationService.verifyCredentials(authReq.getUsername(),authReq.getPassword());
 
             if (!success) return new ResponseEntity<>("Unauthorized",HttpStatus.UNAUTHORIZED);
         }

@@ -1,10 +1,13 @@
 package com.moneyview.employeePortal.controller;
 
+import com.moneyview.employeePortal.dto.DocumentRequest;
 import com.moneyview.employeePortal.dto.EmployeeRequest;
 import com.moneyview.employeePortal.service.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*", originPatterns = "*")
 @RestController
@@ -28,7 +31,13 @@ public class DocumentController {
 
 
     @PostMapping("/docs")
-    public ResponseEntity<?> uploadUserDocuments(@RequestBody EmployeeRequest req){
-        return new ResponseEntity<>("Hello",HttpStatus.CREATED);
+    public ResponseEntity<?> uploadUserDocuments(@RequestBody DocumentRequest req){
+        String docsUrl= null;
+        try {
+            docsUrl = employeeService.uploadDocument(req);
+        } catch (IOException e) {
+           return new ResponseEntity<>("Upload Fail", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(docsUrl,HttpStatus.CREATED);
     }
 }

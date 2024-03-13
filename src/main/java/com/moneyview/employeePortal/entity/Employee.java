@@ -58,4 +58,8 @@ public class Employee {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> assignedTags;
+
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
+    private Set<Document> documents;
 }
