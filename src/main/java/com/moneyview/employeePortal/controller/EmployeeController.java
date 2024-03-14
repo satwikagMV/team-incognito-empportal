@@ -54,7 +54,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateEmployee(EmployeeRequest req){
+    public ResponseEntity<?> updateEmployee(@RequestBody EmployeeRequest req){
         try {
             employeeService.updateEmployeeDetails(req);
         } catch (IOException e) {

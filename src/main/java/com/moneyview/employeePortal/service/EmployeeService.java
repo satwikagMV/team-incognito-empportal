@@ -75,7 +75,7 @@ public class EmployeeService {
         }
 
         if (req.getBadgeImg()!=null){
-            cloudinaryService.deleteFile(reqEmp.getBadgeImgUrl());
+            if (reqEmp.getBadgeImgUrl()!=null) firebaseService.deleteFile(reqEmp.getBadgeImgUrl());
             String badgeImgUrl = firebaseService.uploadFile(req.getBadgeImg());
             reqEmp.setBadgeImgUrl(badgeImgUrl);
         }
