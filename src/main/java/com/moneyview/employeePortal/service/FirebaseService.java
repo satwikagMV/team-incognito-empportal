@@ -26,6 +26,7 @@ public class FirebaseService {
     public String uploadFile(MultipartFile file) throws IOException {
 
         Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+        System.out.println(file.getContentType());
         String name = generateFileName(file.getOriginalFilename());
         bucket.create(name, file.getBytes(), file.getContentType());
 

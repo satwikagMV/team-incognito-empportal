@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocumentRequest {
-    private MultipartFile document;
+    private MultipartFile file=null;
     private String fileName;
     private String username;
 }

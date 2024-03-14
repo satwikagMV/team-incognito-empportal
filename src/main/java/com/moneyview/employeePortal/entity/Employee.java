@@ -27,6 +27,7 @@ public class Employee {
     @Column(unique = true)
     private String username;
 
+    @JsonIgnore
     private String password;
 
     private String name;

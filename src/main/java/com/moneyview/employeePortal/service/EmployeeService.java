@@ -115,15 +115,18 @@ public class EmployeeService {
     }
 
     public String uploadDocument(DocumentRequest req) throws IOException {
-        Employee currEmployee=employeeRepository.findOneByUsername(req.getUsername());
+        System.out.println(req.getUsername());
+        Employee currEmp=employeeRepository.findOneByUsername(req.getUsername());
+        System.out.println(currEmp);
         String docUrl;
-
-        docUrl=firebaseService.uploadFile(req.getDocument());
-
-        Document doc=Document.builder().name(req.getFileName()).url(docUrl).build();
+        System.out.println(req.getFile());
+        docUrl=firebaseService.uploadFile(req.getFile());
+        System.out.println(docUrl);
+        Document doc=Document.builder().name(req.getFileName()).url(docUrl).employee(currEmp).build();
         documentRepository.save(doc);
-        currEmployee.getDocuments().add(doc);
-        employeeRepository.save(currEmployee);
+        System.out.println(doc);
+//        currEmp.getDocuments().add(doc);
+//        employeeRepository.save(currEmp);
         return docUrl;
     }
 
@@ -145,6 +148,13 @@ public class EmployeeService {
         tagRepository.save(reqTag);
         Employee currEmp=employeeRepository.findOneByUsername(username);
         currEmp.getAssignedTags().add(reqTag);
+        employeeRepository.save(currEmp);
+    }
+
+    public void unAssignTag(String username, String tagName, Type type){
+        Tag reqTag= tagRepository.findByNameAndType(tagName,type);
+        Employee currEmp=employeeRepository.findOneByUsername(username);
+        currEmp.getAssignedTags().remove(reqTag);
         employeeRepository.save(currEmp);
     }
 

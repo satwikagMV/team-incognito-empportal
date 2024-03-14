@@ -12,15 +12,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Document {
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
     private String url;
+
+
     @Column(unique = true)
     private String name;
 
 
     @JsonIgnore
-    @ManyToOne (cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
+    @ManyToOne (cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Employee employee;
 }

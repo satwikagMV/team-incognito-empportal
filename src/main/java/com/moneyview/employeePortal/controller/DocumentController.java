@@ -31,7 +31,8 @@ public class DocumentController {
 
 
     @PostMapping("/docs")
-    public ResponseEntity<?> uploadUserDocuments(@RequestBody DocumentRequest req){
+    public ResponseEntity<?> uploadUserDocuments(DocumentRequest req){
+        System.out.println("reached controller");
         String docsUrl= null;
         try {
             docsUrl = employeeService.uploadDocument(req);
@@ -40,4 +41,5 @@ public class DocumentController {
         }
         return new ResponseEntity<>(docsUrl,HttpStatus.CREATED);
     }
+
 }

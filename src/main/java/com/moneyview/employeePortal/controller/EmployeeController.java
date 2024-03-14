@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*", originPatterns = "*")
@@ -44,6 +45,22 @@ public class EmployeeController {
     public ResponseEntity<?> assignEmployeeTag(@RequestBody EmployeeTagDto empTag) {
         employeeService.assignTag(empTag.getUsername(), empTag.getTagName(), empTag.getType());
         return new ResponseEntity<>("Tag assigned successfully", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/unassign")
+    public ResponseEntity<?> unAssignEmployeeTag(@RequestBody EmployeeTagDto empTag) {
+        employeeService.unAssignTag(empTag.getUsername(), empTag.getTagName(), empTag.getType());
+        return new ResponseEntity<>("Tag unassigned successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updateEmployee(@RequestBody EmployeeRequest req){
+        try {
+            employeeService.updateEmployeeDetails(req);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Unable to Update", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>("Updated Successfully",HttpStatus.OK);
     }
 }
 

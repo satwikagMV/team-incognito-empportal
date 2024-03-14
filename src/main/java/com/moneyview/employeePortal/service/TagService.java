@@ -1,6 +1,7 @@
 package com.moneyview.employeePortal.service;
 
 import com.moneyview.employeePortal.dto.EmployeeDto;
+import com.moneyview.employeePortal.dto.SearchEmpDto;
 import com.moneyview.employeePortal.dto.TagDto;
 import com.moneyview.employeePortal.entity.Employee;
 import com.moneyview.employeePortal.entity.Tag;
@@ -40,12 +41,9 @@ public class TagService {
     }
 
 
-    public List<EmployeeDto> getAssociatedEmployees(String tagName,Type tagType){
-        return tagRepository.findByNameAndType(tagName,tagType)
-                .getAssociatedEmployees()
-                .stream()
-                .map(TagService::mapToDto)
-                .toList();
+    public List<SearchEmpDto> getAssociatedEmployees(String tagName, Type tagType){
+        return tagRepository.findByNameAndType(tagName, tagType)
+                .getAssociatedEmployees().stream().map(emp->new SearchEmpDto(emp.getUsername(), emp.getName(), emp.getDisplayImgUrl())).toList();
     }
 
     public List<String> getIndividualTags(){
